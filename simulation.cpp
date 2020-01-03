@@ -15,6 +15,9 @@
 
 using namespace std;
 
+
+///TESTING GITHUB
+
 bool Simulation::checkIndexes(int x, int y)
 {
     return ((x >= 0 && y >= 0 && x < rows && y < columns)? 1 : 0);
