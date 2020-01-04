@@ -14,7 +14,7 @@ struct Pixel
 {
     std::string icon = " ";
     int x, y, index;
-    bool moved = 0;
+    bool moved = 0, free = 0;
     virtual void resetMoved(bool newMoved=0);
 
     virtual bool dispatchShift(Simulation& sim, int dvx, int dvy);
@@ -40,7 +40,7 @@ struct Earth : public Pixel
 
 struct Water : public Pixel
 {
-    int vx = 0, vy = 0;
+    int vx = 0, vy = 0;//, energyX = 0, energyY = 0;
 
 
     bool dispatchShift(Simulation& sim, int dvx, int dvy) override;

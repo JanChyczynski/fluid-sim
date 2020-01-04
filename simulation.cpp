@@ -49,11 +49,12 @@ bool Simulation::shift(Water& curPix, int dvx, int dvy)
     }
     curPix.moved = 1;
     DEBUG COUT << "WATERSHIFT" << ENDL;
+
     curPix.vx = ((curPix.vx+dvx <= -1)? -1 : ((curPix.vx+dvx >= 1)? 1 : 0)); ///so the velocity belongs to <-1, 1>
     curPix.vy = ((curPix.vy+dvy <= -1)? -1 : ((curPix.vy+dvy >= 1)? 1 : 0)); ///so the velocity belongs to <-1, 1>
     DEBUG COUT << "Shifting " << VAR(x) << VAR(y)  << VAR(curPix.vx) << VAR(curPix.vy) << ENDL;
 
-    if(world[x+curPix.vx][y+curPix.vy]->moved == 0 && COUT << "INTERNAL SHIFT" << ENDL &&  world[x+curPix.vx][y+curPix.vy]->dispatchShift(*this, curPix.vx+1, curPix.vy))
+    if(world[x+curPix.vx][y+curPix.vy]->moved == 0 &&  world[x+curPix.vx][y+curPix.vy]->dispatchShift(*this, curPix.vx+1, curPix.vy))
     {
         DEBUG COUT << "ACCUALLY SHIFTED" << VAR(x) << VAR(y) << VAR(curPix.vx) << VAR(curPix.vy) << ENDL;
         DEBUG print();
@@ -74,26 +75,34 @@ bool Simulation::shift(Water& curPix, int dvx, int dvy)
         if(rand() %2)
             swap(directionChangeX, directionChangeY);
 
-        if(world[x+curPix.vy*directionChangeX][y+curPix.vx*directionChangeY]->moved == 0 && COUT << "REDIRECTING SHIFT" << ENDL &&  world[x+curPix.vy*directionChangeX][y+curPix.vx*directionChangeY]->dispatchShift(*this, curPix.vy*directionChangeX+1, curPix.vx*directionChangeY))
+        for(int i = 0; i < 4; i++, swap(directionChangeX, directionChangeY)) ///i: 0, 1 redirecting at free; 2, 3 redirecting and pushing
         {
-            DEBUG COUT << "ACCUALLY REDIRECTED AND SHIFTED" << VAR(x) << VAR(y) << VAR(curPix.vy*directionChangeX) << VAR(curPix.vx*directionChangeY) << ENDL;
-            DEBUG print();
-
-
-            if(checkIndexes(x+curPix.vy*directionChangeX, y+curPix.vx*directionChangeY) == 0 || checkIndexes(x, y) == 0)
+            if(i < 2 && world[x+curPix.vy*directionChangeX][y+curPix.vx*directionChangeY]->free == 0)///at first try redirecting on a free box
             {
-                DEBUG COUT << VAR(x) << VAR(y) << VAR(x+curPix.vy*directionChangeX) << VAR(y+curPix.vx*directionChangeY) << ENDL;
+                continue;
             }
-            int oldX = x, oldY = y;  ///for not to swap on swapped indexes
-            swap(world[oldX][oldY], world[oldX+curPix.vy*directionChangeX][oldY+curPix.vx*directionChangeY]);
-            swap(world[oldX][oldY]->x, world[oldX+curPix.vy*directionChangeX][oldY+curPix.vx*directionChangeY]->x);
-            swap(world[oldX][oldY]->y, world[oldX+curPix.vy*directionChangeX][oldY+curPix.vx*directionChangeY]->y);
-            curPix.vx = curPix.vy*directionChangeX;
-            curPix.vy = curPix.vx*directionChangeY;
-            DEBUG print();
-            DEBUG checkAllCoords();
-            curPix.moved = 1;
-            return true;
+            if(world[x+curPix.vy*directionChangeX][y+curPix.vx*directionChangeY]->moved == 0 && world[x+curPix.vy*directionChangeX][y+curPix.vx*directionChangeY]->dispatchShift(*this, curPix.vy*directionChangeX+1, curPix.vx*directionChangeY))
+            {
+                DEBUG COUT << "ACCUALLY REDIRECTED AND SHIFTED" << VAR(x) << VAR(y) << VAR(curPix.vy*directionChangeX) << VAR(curPix.vx*directionChangeY) << ENDL;
+                DEBUG print();
+
+
+                if(checkIndexes(x+curPix.vy*directionChangeX, y+curPix.vx*directionChangeY) == 0 || checkIndexes(x, y) == 0)
+                {
+                    DEBUG COUT << VAR(x) << VAR(y) << VAR(x+curPix.vy*directionChangeX) << VAR(y+curPix.vx*directionChangeY) << ENDL;
+                }
+                int oldX = x, oldY = y;  ///for not to swap on swapped indexes
+                swap(world[oldX][oldY], world[oldX+curPix.vy*directionChangeX][oldY+curPix.vx*directionChangeY]);
+                swap(world[oldX][oldY]->x, world[oldX+curPix.vy*directionChangeX][oldY+curPix.vx*directionChangeY]->x);
+                swap(world[oldX][oldY]->y, world[oldX+curPix.vy*directionChangeX][oldY+curPix.vx*directionChangeY]->y);
+                curPix.vx = curPix.vy*directionChangeX;
+                curPix.vy = curPix.vx*directionChangeY;
+                DEBUG print();
+                DEBUG checkAllCoords();
+                curPix.moved = 1;
+                return true;
+            }
+
         }
 
         curPix.moved = 0;
@@ -167,7 +176,7 @@ void Simulation::simulate(int timeLimit)
     for(int t = 0; t < timeLimit; ++t)
     {
         calculate();
-        usleep(300000);                  ///CYCLE TIME
+        usleep(150000);                  ///CYCLE TIME
         system("clear");
         print();
         checkAllCoords();

@@ -35,6 +35,7 @@ bool Air::dispatchShift(Simulation& sim, int dvx, int dvy)
 Air::Air(int argx/*= -1*/, int argy/*= -1*/, int argindex/*= -1*/): Pixel(argx, argy, argindex)
 {
     icon = " ";
+    free = 1;
 }
 
 ///EARTH
