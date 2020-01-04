@@ -23,6 +23,11 @@ bool Simulation::checkIndexes(int x, int y)
     return ((x >= 0 && y >= 0 && x < rows && y < columns)? 1 : 0);
 }
 
+inline int normV(int v)
+{
+    return ((v <= -1)? -1 : ((v >= 1)? 1 : 0));
+}
+
 bool Simulation::shift(Pixel& curPix, int dvx, int dvy){DEBUG COUT << "PIXEL SHIFT" << VAR(curPix.x) << VAR(curPix.y) <<VAR(curPix.icon) << ENDL;
 //curPix.resetMoved();
 return false;

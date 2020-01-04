@@ -24,6 +24,8 @@ public:
 
     bool checkIndexes(int x, int y);
 
+    inline int normV(int v);
+
     bool shift(Pixel& curPix, int dvx, int dvy);
 
     bool shift(Air& curPix, int dvx, int dvy);
