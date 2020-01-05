@@ -139,7 +139,7 @@ bool Simulation::shift(Water& curPix, int dvx, int dvy) ///Thats anti-physics ga
         curPix.vy = prePushVy;
 
         if(abs(curPix.vx) > 3) curPix.vx /= 2;
-        if(abs(curPix.vy) > 2) curPix.vy /= 2;
+        if(abs(curPix.vy) > 1) curPix.vy /= 2;
 
         curPix.moved = 0;
     }
@@ -182,11 +182,19 @@ void Simulation::calculate()
     {
         for(int j = 0; j < columns; ++j)
         {
-            if(i < rows-1 && world[i+1][j]->solid == 0)
+            if(i < rows-1 && world[i+1][j]->solid == 0) ///free fall
             {
                 world[i][j]->dispatchShift(*this, 1, 0);
             }
-            else
+            else if(i < rows-1 && j > 0 && world[i+1][j-1]->free && world[i][j-1]->free) ///slipping from the edge
+            {
+                world[i][j]->dispatchShift(*this, 0, -1);
+            }
+            else if(i < rows-1 && j < columns-1 && world[i+1][j+1]->free && world[i][j+1]->free) ///slipping from the edge
+            {
+                world[i][j]->dispatchShift(*this, 0, 1);
+            }
+            else ///resting on the ground
             {
                 world[i][j]->dispatchShift(*this, 0, 0);
             }
