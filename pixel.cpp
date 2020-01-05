@@ -47,6 +47,7 @@ bool Earth::dispatchShift(Simulation& sim, int dvx, int dvy)
 Earth::Earth(int argx/*= -1*/, int argy/*= -1*/, int argindex/*= -1*/): Pixel(argx, argy, argindex)
 {
     icon = "\e[91m█";
+    solid = 1;
 }
 
 ///WATER

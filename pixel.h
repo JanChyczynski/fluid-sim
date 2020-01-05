@@ -14,7 +14,7 @@ struct Pixel
 {
     std::string icon = " ";
     int x, y, index;
-    bool moved = 0, free = 0;
+    bool moved = 0, free = 0, solid = 0;
     virtual void resetMoved(bool newMoved=0);
 
     virtual bool dispatchShift(Simulation& sim, int dvx, int dvy);

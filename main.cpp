@@ -19,7 +19,7 @@ int main()
     int timeLimit;
     cin >> timeLimit;
 
-    Simulation mySim;
+    Simulation mySim(16);
     mySim.input();
     mySim.simulate(timeLimit);
 
