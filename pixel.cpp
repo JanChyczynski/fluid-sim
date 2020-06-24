@@ -17,42 +17,44 @@ using namespace std;
 ///PIXEL
 void Pixel::resetMoved(bool newMoved/*=0*/){/*DEBUG COUT << "RESET PIXEL" << ENDL;*/}
 
-bool Pixel::dispatchShift(Simulation& sim, int deltavx, int deltavy)
+bool Pixel::dispatchShift(Simulation& sim, int deltavx, int deltavy, int x, int y)
 {
-    return sim.shift(*this, deltavx, deltavy);
+    return sim.shift(*this, deltavx, deltavy, x, y);
 }
 
-Pixel::Pixel(int argx/*= -1*/, int argy/*= -1*/): x(argx), y(argy){}
+void Pixel::setDebugIcon(){}
+
+Pixel::Pixel(){}
 Pixel::~Pixel() = default;
 
 ///AIR
-bool Air::dispatchShift(Simulation& sim, int deltavx, int deltavy)
+bool Air::dispatchShift(Simulation& sim, int deltavx, int deltavy, int x, int y)
 {
-    return sim.shift(*this, deltavx, deltavy);
+    return sim.shift(*this, deltavx, deltavy, x, y);
 }
 
-Air::Air(int argx/*= -1*/, int argy/*= -1*/): Pixel(argx, argy)
+Air::Air(): Pixel()
 {
     icon = " ";
     free = 1;
 }
 
 ///EARTH
-bool Earth::dispatchShift(Simulation& sim, int deltavx, int deltavy)
+bool Earth::dispatchShift(Simulation& sim, int deltavx, int deltavy, int x, int y)
 {
-    return sim.shift(*this, deltavx, deltavy);
+    return sim.shift(*this, deltavx, deltavy, x, y);
 }
 
-Earth::Earth(int argx/*= -1*/, int argy/*= -1*/): Pixel(argx, argy)
+Earth::Earth(): Pixel()
 {
     icon = "\e[91m█";
     solid = 1;
 }
 
 ///WATER
-bool Water::dispatchShift(Simulation& sim, int deltavx, int deltavy)
+bool Water::dispatchShift(Simulation& sim, int deltavx, int deltavy, int x, int y)
 {
-    return sim.shift(*this, deltavx, deltavy);
+    return sim.shift(*this, deltavx, deltavy, x, y);
 }
 
 void Water::resetMoved(bool newMoved/*= 0*/)
@@ -61,7 +63,13 @@ void Water::resetMoved(bool newMoved/*= 0*/)
     //DEBUG COUT << "RESET WATER" << ENDL;
 }
 
-Water::Water(int argx/*= -1*/, int argy/*= -1*/, int argvx/*= 0*/, int argvy/*= 0*/): Pixel(argx, argy), vx(argvx), vy(argvy)
+void Water::setDebugIcon()
+{
+    icon = (vx >= 0)? "\e[36m" : "\e[37m";
+    icon += ((abs(vx) > 9)?"+" : to_string(abs(vx)));
+}
+
+Water::Water(int argvx/*= 0*/, int argvy/*= 0*/): Pixel(), vx(argvx), vy(argvy)
 {
     icon = "\e[36m█";
 }

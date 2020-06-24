@@ -26,17 +26,15 @@ private:
 
     inline int normV(int v);
 public:
-    bool shift(Pixel& currentPixel, int deltavx, int deltavy);
+    bool shift(Pixel& currentPixel, int deltavx, int deltavy, int x, int y);
 
-    bool shift(Air& currentPixel, int deltavx, int deltavy);
+    bool shift(Air& currentPixel, int deltavx, int deltavy, int x, int y);
 
-    bool shift(Earth& currentPixel, int deltavx, int deltavy);
+    bool shift(Earth& currentPixel, int deltavx, int deltavy, int x, int y);
 
-    bool shift(Water& currentPixel, int deltavx, int deltavy);
+    bool shift(Water& currentPixel, int deltavx, int deltavy, int x, int y);
 private:
     void clearMoved();
-
-    bool checkAllCoords();
 
     void calculate();
 
