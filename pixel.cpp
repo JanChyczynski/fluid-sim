@@ -1,11 +1,10 @@
 #include "simulation.h"
 #include "pixel.h"
 
-#include <bits/stdc++.h> /*
 #include <iostream>
 #include <vector>
 #include <string>
-#include <memory>*/
+#include <memory>
 
 
 #define DEBUG if (1)
@@ -18,18 +17,18 @@ using namespace std;
 ///PIXEL
 void Pixel::resetMoved(bool newMoved/*=0*/){/*DEBUG COUT << "RESET PIXEL" << ENDL;*/}
 
-bool Pixel::dispatchShift(Simulation& sim, int dvx, int dvy)
+bool Pixel::dispatchShift(Simulation& sim, int deltavx, int deltavy)
 {
-    return sim.shift(*this, dvx, dvy);
+    return sim.shift(*this, deltavx, deltavy);
 }
 
 Pixel::Pixel(int argx/*= -1*/, int argy/*= -1*/, int argindex/*= -1*/): x(argx), y(argy), index(argindex){}
 Pixel::~Pixel() = default;
 
 ///AIR
-bool Air::dispatchShift(Simulation& sim, int dvx, int dvy)
+bool Air::dispatchShift(Simulation& sim, int deltavx, int deltavy)
 {
-    return sim.shift(*this, dvx, dvy);
+    return sim.shift(*this, deltavx, deltavy);
 }
 
 Air::Air(int argx/*= -1*/, int argy/*= -1*/, int argindex/*= -1*/): Pixel(argx, argy, argindex)
@@ -39,9 +38,9 @@ Air::Air(int argx/*= -1*/, int argy/*= -1*/, int argindex/*= -1*/): Pixel(argx, 
 }
 
 ///EARTH
-bool Earth::dispatchShift(Simulation& sim, int dvx, int dvy)
+bool Earth::dispatchShift(Simulation& sim, int deltavx, int deltavy)
 {
-    return sim.shift(*this, dvx, dvy);
+    return sim.shift(*this, deltavx, deltavy);
 }
 
 Earth::Earth(int argx/*= -1*/, int argy/*= -1*/, int argindex/*= -1*/): Pixel(argx, argy, argindex)
@@ -51,9 +50,9 @@ Earth::Earth(int argx/*= -1*/, int argy/*= -1*/, int argindex/*= -1*/): Pixel(ar
 }
 
 ///WATER
-bool Water::dispatchShift(Simulation& sim, int dvx, int dvy)
+bool Water::dispatchShift(Simulation& sim, int deltavx, int deltavy)
 {
-    return sim.shift(*this, dvx, dvy);
+    return sim.shift(*this, deltavx, deltavy);
 }
 
 void Water::resetMoved(bool newMoved/*= 0*/)

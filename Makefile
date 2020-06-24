@@ -1,7 +1,7 @@
 CC=g++
 #DBGFLAGS=-std=c++0x -Wall -fsanitize=address -g
 DBGFLAGS=-std=c++14 -Wall -D_GLIBCXX_DEBUG -g
-FLAGS=-Wconversion -Wall -Wextra -Wshadow -std=c++14 -O2 -g -D_GLIBCXX_DEBUG#-fsanitize=address
+FLAGS=-Wconversion -Wall -Wextra -Wshadow -std=c++14 -O2 -g -fsanitize=address#-D_GLIBCXX_DEBUG
 
 
 re: clean sim

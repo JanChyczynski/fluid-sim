@@ -1,13 +1,12 @@
 ///high-velocity branch
 #pragma once
 
-#include <bits/stdc++.h> /*
+
 #include <iostream>
 #include <vector>
 #include <string>
 #include <memory>
-#include <algorithm>*/
-//#include "pixel.h"
+#include <algorithm>
 
 
 ///from "pixel.h"
@@ -18,23 +17,23 @@ struct Water;
 
 class Simulation
 {
-public:
+private:
     int rows = 0, columns = 0;
 
     std::vector<std::vector<std::unique_ptr<Pixel>>> world;
 
-    bool checkIndexes(int x, int y);
+    bool checkIndices(int x, int y);
 
     inline int normV(int v);
+public:
+    bool shift(Pixel& currentPixel, int deltavx, int deltavy);
 
-    bool shift(Pixel& curPix, int dvx, int dvy);
+    bool shift(Air& currentPixel, int deltavx, int deltavy);
 
-    bool shift(Air& curPix, int dvx, int dvy);
+    bool shift(Earth& currentPixel, int deltavx, int deltavy);
 
-    bool shift(Earth& curPix, int dvx, int dvy);
-
-    bool shift(Water& curPix, int dvx, int dvy);
-
+    bool shift(Water& currentPixel, int deltavx, int deltavy);
+private:
     void clearMoved();
 
     bool checkAllCoords();
@@ -42,7 +41,7 @@ public:
     void calculate();
 
     void print();
-
+public:
     void simulate(int timeLimit);
 
     void input();

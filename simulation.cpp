@@ -1,9 +1,8 @@
-#include <bits/stdc++.h> /*
 #include <iostream>
 #include <vector>
 #include <string>
 #include <memory>
-#include <algorithm>*/
+#include <utility>
 #include <unistd.h>
 #include "pixel.h"
 #include "simulation.h"
@@ -15,10 +14,7 @@
 
 using namespace std;
 
-
-///TESTING GITHUB
-
-bool Simulation::checkIndexes(int x, int y)
+bool Simulation::checkIndices(int x, int y)
 {
     return ((x >= 0 && y >= 0 && x < rows && y < columns)? 1 : 0);
 }
@@ -28,120 +24,118 @@ inline int Simulation::normV(int v)
     return ((v <= -1)? -1 : ((v >= 1)? 1 : 0));  ///so the velocity belongs to <-1, 1>
 }
 
-bool Simulation::shift(Pixel& curPix, int dvx, int dvy){DEBUG COUT << "PIXEL SHIFT" << VAR(curPix.x) << VAR(curPix.y) <<VAR(curPix.icon) << ENDL;
-//curPix.resetMoved();
+bool Simulation::shift(Pixel& currentPixel, int deltavx, int deltavy){DEBUG COUT << "PIXEL SHIFT" << VAR(currentPixel.x) << VAR(currentPixel.y) <<VAR(currentPixel.icon) << ENDL;
+//currentPixel.resetMoved();
 return false;
 }/**/
 
-bool Simulation::shift(Air& curPix, int dvx, int dvy)
+bool Simulation::shift(Air& currentPixel, int deltavx, int deltavy)
 {
     DEBUG COUT << "AIR SHIFT" << ENDL;
     return true;
 }
 
-bool Simulation::shift(Earth& curPix, int dvx, int dvy)
+bool Simulation::shift(Earth& currentPixel, int deltavx, int deltavy)
 {
     DEBUG COUT << "EARTH SHIFT" << ENDL;
     return false;
 }
 
-bool Simulation::shift(Water& curPix, int dvx, int dvy) ///Thats anti-physics garbage
+bool Simulation::shift(Water& currentPixel, int deltavx, int deltavy) ///It doesn't follow physics
 {
-    int& x = curPix.x, y =curPix.y;
-    if(curPix.moved)
+    int& x = currentPixel.x, y =currentPixel.y;
+    if(currentPixel.moved)
     {
         return false;
     }
-    if(dvx > 0 && curPix.vx < -1)
+    if(deltavx > 0 && currentPixel.vx < -1)
     {
-        curPix.vx /= 2;
+        currentPixel.vx /= 2;
     }
-    if(dvy > 0 && curPix.vy < -1)
+    if(deltavy > 0 && currentPixel.vy < -1)
     {
-        curPix.vy /= 2;
+        currentPixel.vy /= 2;
     }
-    curPix.moved = 1;
+    currentPixel.moved = 1;
     DEBUG COUT << "WATERSHIFT" << ENDL;
 
-    curPix.vx += dvx;
-    curPix.vy += dvy;
-    DEBUG COUT << "Shifting " << VAR(x) << VAR(y)  << VAR(curPix.vx) << VAR(curPix.vy) << ENDL;
+    currentPixel.vx += deltavx;
+    currentPixel.vy += deltavy;
+    DEBUG COUT << "Shifting " << VAR(x) << VAR(y)  << VAR(currentPixel.vx) << VAR(currentPixel.vy) << ENDL;
 
-    if(world[x+normV(curPix.vx)][y+normV(curPix.vy)]->moved == 0 &&  world[x+normV(curPix.vx)][y+normV(curPix.vy)]->dispatchShift(*this, curPix.vx+1, curPix.vy))
+    if(world[x+normV(currentPixel.vx)][y+normV(currentPixel.vy)]->moved == 0 &&  world[x+normV(currentPixel.vx)][y+normV(currentPixel.vy)]->dispatchShift(*this, currentPixel.vx+1, currentPixel.vy))
     {
-        DEBUG COUT << "ACCUALLY SHIFTED" << VAR(x) << VAR(y) << VAR(curPix.vx) << VAR(curPix.vy) << ENDL;
+        DEBUG COUT << "ACCUALLY SHIFTED" << VAR(x) << VAR(y) << VAR(currentPixel.vx) << VAR(currentPixel.vy) << ENDL;
         DEBUG print();
-        int oldX = x, oldY = y; ///for not to swap on swapped indexes
-        swap(world[oldX][oldY], world[oldX+normV(curPix.vx)][oldY+normV(curPix.vy)]);
-        swap(world[oldX][oldY]->x, world[oldX+normV(curPix.vx)][oldY+normV(curPix.vy)]->x);
-        swap(world[oldX][oldY]->y, world[oldX+normV(curPix.vx)][oldY+normV(curPix.vy)]->y);
+        int oldX = x, oldY = y; ///for not to swap on swapped indices
+        swap(world[oldX][oldY], world[oldX+normV(currentPixel.vx)][oldY+normV(currentPixel.vy)]);
+        swap(world[oldX][oldY]->x, world[oldX+normV(currentPixel.vx)][oldY+normV(currentPixel.vy)]->x);
+        swap(world[oldX][oldY]->y, world[oldX+normV(currentPixel.vx)][oldY+normV(currentPixel.vy)]->y);
 
         DEBUG print();
         DEBUG checkAllCoords();
-        curPix.moved = 1;
+        currentPixel.moved = 1;
         return true;
     }
     else
     {
-        //if()
-
         int directionChangeX = 1;
         int directionChangeY = -1;
         if(rand() %2)
             swap(directionChangeX, directionChangeY);
 
-        int prePushVx = curPix.vx;
-        int prePushVy = curPix.vy;
+        int prePushVx = currentPixel.vx;
+        int prePushVy = currentPixel.vy;
 
-        //curPix.vx -= normV(curPix.vx);
-        //curPix.vy -= normV(curPix.vy);
-        curPix.vx /= 3;
-        curPix.vy /= 2;
-        for(int i = 0; i < 4 && (abs(curPix.vx) > 0 || abs(curPix.vy) > 0); i++, swap(directionChangeX, directionChangeY)) ///i: 0, 1 redirecting at free; 2, 3 redirecting and pushing
+        //currentPixel.vx -= normV(currentPixel.vx);
+        //currentPixel.vy -= normV(currentPixel.vy);
+        currentPixel.vx /= 3;
+        currentPixel.vy /= 2;
+        for(int i = 0; i < 4 && (abs(currentPixel.vx) > 0 || abs(currentPixel.vy) > 0); i++, swap(directionChangeX, directionChangeY)) ///i: 0, 1 redirecting at free; 2, 3 redirecting and pushing
         {
             if(i== 2)
             {
-                //curPix.vx -= normV(curPix.vx);
-                //curPix.vy -= normV(curPix.vy);
-                curPix.vx /= 3;
-                curPix.vy /= 3;
+                //currentPixel.vx -= normV(currentPixel.vx);
+                //currentPixel.vy -= normV(currentPixel.vy);
+                currentPixel.vx /= 3;
+                currentPixel.vy /= 3;
 
             }
 
-            if(i < 2 && world[x+normV(curPix.vy*directionChangeX)][y+normV(curPix.vx*directionChangeY)]->free == 0)///at first try redirecting on a free box
+            if(i < 2 && world[x+normV(currentPixel.vy*directionChangeX)][y+normV(currentPixel.vx*directionChangeY)]->free == 0)///at first try redirecting on a free box
             {
                 continue;
             }
-            if(world[x+normV(curPix.vy*directionChangeX)][y+normV(curPix.vx*directionChangeY)]->moved == 0 && world[x+normV(curPix.vy*directionChangeX)][y+normV(curPix.vx*directionChangeY)]->dispatchShift(*this, curPix.vy*directionChangeX+1, curPix.vx*directionChangeY))
+            if(world[x+normV(currentPixel.vy*directionChangeX)][y+normV(currentPixel.vx*directionChangeY)]->moved == 0 && world[x+normV(currentPixel.vy*directionChangeX)][y+normV(currentPixel.vx*directionChangeY)]->dispatchShift(*this, currentPixel.vy*directionChangeX+1, currentPixel.vx*directionChangeY))
             {
-                DEBUG COUT << "ACCUALLY REDIRECTED AND SHIFTED" << VAR(x) << VAR(y) << VAR(curPix.vy*directionChangeX) << VAR(curPix.vx*directionChangeY) << ENDL;
+                DEBUG COUT << "ACCUALLY REDIRECTED AND SHIFTED" << VAR(x) << VAR(y) << VAR(currentPixel.vy*directionChangeX) << VAR(currentPixel.vx*directionChangeY) << ENDL;
                 DEBUG print();
 
 
-                if(checkIndexes(x+curPix.vy*directionChangeX, y+curPix.vx*directionChangeY) == 0 || checkIndexes(x, y) == 0)
+                if(checkIndices(x+currentPixel.vy*directionChangeX, y+currentPixel.vx*directionChangeY) == 0 || checkIndices(x, y) == 0)
                 {
-                    DEBUG COUT << VAR(x) << VAR(y) << VAR(x+curPix.vy*directionChangeX) << VAR(y+curPix.vx*directionChangeY) << ENDL;
+                    DEBUG COUT << VAR(x) << VAR(y) << VAR(x+currentPixel.vy*directionChangeX) << VAR(y+currentPixel.vx*directionChangeY) << ENDL;
                 }
                 int oldX = x, oldY = y;  ///for not to swap on swapped indexes
-                swap(world[oldX][oldY], world[oldX+normV(curPix.vy*directionChangeX)][oldY+normV(curPix.vx*directionChangeY)]);
-                swap(world[oldX][oldY]->x, world[oldX+normV(curPix.vy*directionChangeX)][oldY+normV(curPix.vx*directionChangeY)]->x);
-                swap(world[oldX][oldY]->y, world[oldX+normV(curPix.vy*directionChangeX)][oldY+normV(curPix.vx*directionChangeY)]->y);
-                curPix.vx = curPix.vy*directionChangeX;
-                curPix.vy = curPix.vx*directionChangeY;
+                swap(world[oldX][oldY], world[oldX+normV(currentPixel.vy*directionChangeX)][oldY+normV(currentPixel.vx*directionChangeY)]);
+                swap(world[oldX][oldY]->x, world[oldX+normV(currentPixel.vy*directionChangeX)][oldY+normV(currentPixel.vx*directionChangeY)]->x);
+                swap(world[oldX][oldY]->y, world[oldX+normV(currentPixel.vy*directionChangeX)][oldY+normV(currentPixel.vx*directionChangeY)]->y);
+                currentPixel.vx = currentPixel.vy*directionChangeX;
+                currentPixel.vy = currentPixel.vx*directionChangeY;
                 DEBUG print();
                 DEBUG checkAllCoords();
-                curPix.moved = 1;
+                currentPixel.moved = 1;
                 return true;
             }
 
         }
-        curPix.vx = prePushVx;
-        curPix.vy = prePushVy;
+        currentPixel.vx = prePushVx;
+        currentPixel.vy = prePushVy;
 
-        if(abs(curPix.vx) > 3) curPix.vx /= 2;
-        if(abs(curPix.vy) > 1) curPix.vy /= 2;
+        if(abs(currentPixel.vx) > 3) currentPixel.vx /= 2;
+        if(abs(currentPixel.vy) > 1) currentPixel.vy /= 2;
 
-        curPix.moved = 0;
+        currentPixel.moved = 0;
     }
     return false;
 }
@@ -220,15 +214,17 @@ void Simulation::print()//█
     }
 }
 
-void Simulation::simulate(int timeLimit)
+void Simulation::simulate(int duration)
 {
     system("clear");
+    DEBUG COUT << "first print" << ENDL;
     print();
-    for(int t = 0; t < timeLimit; ++t)
+    for(int t = 0; t < duration; ++t)
     {
         calculate();
         usleep(150000);                  ///CYCLE TIME
         system("clear");
+        DEBUG COUT << VAR(t) << ENDL << ENDL;
         print();
         checkAllCoords();
         //usleep(3000000);
@@ -260,6 +256,11 @@ void Simulation::input()
             else if(ch == '.')
             {
                 world[i][j] = make_unique<Air>(i, j);
+            }
+            else
+            {
+                cout << "Unknown symbol on input: row " << i << ", column " << j << ". Exiting..." << endl;
+                exit(0);
             }
         }
     }
