@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <vector>
 #include <string>
 #include <memory>
@@ -41,20 +42,13 @@ bool Simulation::shift(Earth& currentPixel, int deltavx, int deltavy, int x, int
     return false;
 }
 
-bool Simulation::shift(Water& currentPixel, int deltavx, int deltavy, int x, int y) ///It doesn't follow physics
+bool Simulation::shift(Water& currentPixel, int deltavx, int deltavy, int x, int y) ///It doesn't obey physics  | x - row, y - column, (0, 0) is top left corner
 {
     if(currentPixel.moved)
     {
         return false;
     }
-    /*if(deltavx > 0 && currentPixel.vx < -1)
-    {
-        currentPixel.vx /= 2;
-    }
-    if(deltavy > 0 && (currentPixel.vy < -1 || currentPixel.vy > 1))
-    {
-        currentPixel.vy -= currentPixel.vy/3;
-    }*/
+
     currentPixel.moved = 1;
 
     currentPixel.vx += deltavx;
@@ -66,14 +60,13 @@ bool Simulation::shift(Water& currentPixel, int deltavx, int deltavy, int x, int
     if(world[x+normV(currentPixel.vx)][y+normV(currentPixel.vy)]->moved == 0 &&  world[x+normV(currentPixel.vx)][y+normV(currentPixel.vy)]->dispatchShift(*this, (currentPixel.vx)/2+1, (currentPixel.vy)/2, x+normV(currentPixel.vx), y+normV(currentPixel.vy))) ///destination was free or space were made
     {
         DEBUG COUT << "ACTUALLY SHIFTED" << VAR(x) << VAR(y) << VAR(currentPixel.vx) << VAR(currentPixel.vy) << ENDL;
-
+        DEBUG if(checkIndices(x+normV(currentPixel.vx), y+normV(currentPixel.vy)) == 0 || checkIndices(x, y) == 0)
+            COUT << "INCORRECT INDICES!" << ENDL;
         swap(world[x][y], world[x+normV(currentPixel.vx)][y+normV(currentPixel.vy)]);
 
         currentPixel.vx = (currentPixel.vx)/2;///energy is divided between pushing and pushed object
         currentPixel.vy = (currentPixel.vy)/2;
         currentPixel.moved = 1;
-
-        DEBUG print();
 
         return true;
     }
@@ -85,34 +78,29 @@ bool Simulation::shift(Water& currentPixel, int deltavx, int deltavy, int x, int
         if(rand() %2)  ///randomizes which direction is tried first
             swap(directionChangeX, directionChangeY);
 
-        //currentPixel.vx -= normV(currentPixel.vx);
-        //currentPixel.vy -= normV(currentPixel.vy);
-
-        for(int i = 0; i < 4 && (abs(currentPixel.vx) > 0 || abs(currentPixel.vy) > 0); i++, swap(directionChangeX, directionChangeY)) ///i: 0, 1 redirecting at free; 2, 3 redirecting and pushing
+        if(world[x+normV(currentPixel.vx)][y+normV(currentPixel.vy)]->solid) ///losing enery from collision with solid object
         {
-            /*if(i== 2)
-            {
-                //currentPixel.vx -= normV(currentPixel.vx);
-                //currentPixel.vy -= normV(currentPixel.vy);
-                 if(abs(currentPixel.vx) > 3) currentPixel.vx /= 4; else currentPixel.vx --;
-                 if(abs(currentPixel.vy) > 3)currentPixel.vy /= 3; else currentPixel.vy--;
+            if(abs(currentPixel.vx) > 2) currentPixel.vx /= 2;
+            if(abs(currentPixel.vy) > 2) currentPixel.vy /= 2;
+        }
+        else ///losing energy from other collisions
+        {
+            currentPixel.vx -= currentPixel.vx/3;
+            currentPixel.vy -= currentPixel.vy/3;
+        }
 
-            }*/
-
-            if(i < 2 && world[x+normV(currentPixel.vy*directionChangeX)][y+normV(currentPixel.vx*directionChangeY)]->free == 0)///at first try redirecting on a free box
+        for(int redirectionIteration = 0; redirectionIteration < 4 && (abs(currentPixel.vx) > 0 || abs(currentPixel.vy) > 0); redirectionIteration++, swap(directionChangeX, directionChangeY)) ///redirectionIteration: 0, 1 redirecting at free box; 2, 3 redirecting and pushing
+        {
+            if(redirectionIteration < 2 && world[x+normV(currentPixel.vy*directionChangeX)][y+normV(currentPixel.vx*directionChangeY)]->free == 0)///at first try redirecting on a free box
             {
                 continue;
             }
             if(world[x+normV(currentPixel.vy*directionChangeX)][y+normV(currentPixel.vx*directionChangeY)]->moved == 0 && world[x+normV(currentPixel.vy*directionChangeX)][y+normV(currentPixel.vx*directionChangeY)]->dispatchShift(*this, (currentPixel.vy/2)*directionChangeX+1, (currentPixel.vx/2)*directionChangeY, x+normV(currentPixel.vy*directionChangeX), y+normV(currentPixel.vx*directionChangeY)))
             {
                 DEBUG COUT << "ACTUALLY REDIRECTED AND SHIFTED" << VAR(x) << VAR(y) << VAR(currentPixel.vy*directionChangeX) << VAR(currentPixel.vx*directionChangeY) << ENDL;
-                DEBUG print();
-
-
                 DEBUG if(checkIndices(x+currentPixel.vy*directionChangeX, y+currentPixel.vx*directionChangeY) == 0 || checkIndices(x, y) == 0)
-                {
-                    DEBUG COUT << VAR(x) << VAR(y) << VAR(x+currentPixel.vy*directionChangeX) << VAR(y+currentPixel.vx*directionChangeY) << ENDL;
-                }
+                    COUT << "INCORRECT INDICES!" << ENDL;
+
 
                 swap(world[x][y], world[x+normV(currentPixel.vy*directionChangeX)][y+normV(currentPixel.vx*directionChangeY)]);
 
@@ -121,27 +109,12 @@ bool Simulation::shift(Water& currentPixel, int deltavx, int deltavy, int x, int
 
                 currentPixel.vx /=2; ///energy is divided between pushing and pushed object
                 currentPixel.vy /=2;
-                DEBUG print();
 
                 currentPixel.moved = 1;
                 return true;
             }
 
         }
-
-        if(world[x+normV(currentPixel.vx)][y+normV(currentPixel.vy)]->solid) ///losing enery from collision with solid object
-        {
-            if(abs(currentPixel.vx) > 2) currentPixel.vx /= 2;
-            if(abs(currentPixel.vy) > 2)currentPixel.vy /= 2;
-        }
-        else ///losing energy from deflection
-        {
-            currentPixel.vx -= currentPixel.vx/3;
-            currentPixel.vy -= currentPixel.vy/3;
-        }
-
-        //if(abs(currentPixel.vx) > 3) currentPixel.vx /= 3;
-        //if(abs(currentPixel.vy) > 1) currentPixel.vy /= 3;
 
         currentPixel.moved = 0;
     }
@@ -184,7 +157,6 @@ void Simulation::calculate()
             {
                 world[i][j]->dispatchShift(*this, 0, 0, i, j);
             }
-            //print();
             DEBUG COUT << ENDL;
         }
     }
@@ -192,37 +164,38 @@ void Simulation::calculate()
 }
 
 
-void Simulation::print()//█
+void Simulation::print(int iconType)//█
 {
     for(int i = 0; i < rows; ++i)
     {
-        DEBUG cout << i;
+        DEBUG cout << setw(2) << i;
         for(int j = 0; j < columns; ++j)
         {
-            world[i][j]->setDebugIcon();
+            if(iconType == 1) world[i][j]->setDebugIcon();
+
             cout << world[i][j]->icon;
         }
         cout << endl;
     }
 }
 
-void Simulation::simulate(int duration)
+void Simulation::simulate(int duration, int iconType /*= 0*/) ///0 - blocks, 1 - vertical velocity info, 2 - no ANSI
 {
     system("clear");
     DEBUG COUT << "first print" << ENDL;
-    print();
+    print(iconType);
     for(int t = 0; t < duration; ++t)
     {
         calculate();
-        usleep(150000);                  ///CYCLE TIME
+        usleep(50000);                  ///CYCLE TIME
         system("clear");
         DEBUG COUT << VAR(t) << ENDL << ENDL;
-        print();
-        //usleep(3000000);
+        print(iconType);
+        DEBUG usleep(3000000);
     }
 }
 
-void Simulation::input()
+void Simulation::input(int iconType /*= 0*/)
 {
     cin >> rows >> columns;
 
@@ -238,11 +211,11 @@ void Simulation::input()
             cin >> ch;
             if(ch == 'W')
             {
-                world[i][j] = make_unique<Water>();
+                world[i][j] = make_unique<Water>(0, 0, iconType);
             }
             else if(ch == 'E')
             {
-                world[i][j] = make_unique<Earth>();
+                world[i][j] = make_unique<Earth>(iconType);
             }
             else if(ch == '.')
             {

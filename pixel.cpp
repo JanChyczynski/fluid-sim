@@ -15,7 +15,7 @@
 using namespace std;
 
 ///PIXEL
-void Pixel::resetMoved(bool newMoved/*=0*/){/*DEBUG COUT << "RESET PIXEL" << ENDL;*/}
+void Pixel::resetMoved(bool newMoved/*=0*/){}
 
 bool Pixel::dispatchShift(Simulation& sim, int deltavx, int deltavy, int x, int y)
 {
@@ -45,9 +45,12 @@ bool Earth::dispatchShift(Simulation& sim, int deltavx, int deltavy, int x, int 
     return sim.shift(*this, deltavx, deltavy, x, y);
 }
 
-Earth::Earth(): Pixel()
+Earth::Earth(int iconType /*= 0*/): Pixel()
 {
-    icon = "\e[91m█";
+    if(iconType == 2)
+        icon = "█";
+    else
+        icon = "\e[91m█";
     solid = 1;
 }
 
@@ -60,17 +63,20 @@ bool Water::dispatchShift(Simulation& sim, int deltavx, int deltavy, int x, int 
 void Water::resetMoved(bool newMoved/*= 0*/)
 {
     moved = newMoved;
-    //DEBUG COUT << "RESET WATER" << ENDL;
 }
 
 void Water::setDebugIcon()
 {
-    icon = (vx >= 0)? "\e[36m" : "\e[37m";
+    icon = (vx >= 0)? "\e[97;46m" : "\e[36;107m";
     icon += ((abs(vx) > 9)?"+" : to_string(abs(vx)));
+    icon+= "\e[49m";
 }
 
-Water::Water(int argvx/*= 0*/, int argvy/*= 0*/): Pixel(), vx(argvx), vy(argvy)
+Water::Water(int argvx/*= 0*/, int argvy/*= 0*/, int iconType /*= 0*/): Pixel(), vx(argvx), vy(argvy)
 {
-    icon = "\e[36m█";
+    if(iconType == 2)
+        icon = "#";
+    else
+        icon = "\e[36m█";
 }
 

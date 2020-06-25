@@ -1,6 +1,4 @@
-///high-velocity branch
 #pragma once
-
 
 #include <iostream>
 #include <vector>
@@ -25,6 +23,9 @@ private:
     bool checkIndices(int x, int y);
 
     inline int normV(int v);
+
+    void clearMoved();
+
 public:
     bool shift(Pixel& currentPixel, int deltavx, int deltavy, int x, int y);
 
@@ -33,16 +34,14 @@ public:
     bool shift(Earth& currentPixel, int deltavx, int deltavy, int x, int y);
 
     bool shift(Water& currentPixel, int deltavx, int deltavy, int x, int y);
-private:
-    void clearMoved();
 
     void calculate();
 
-    void print();
-public:
-    void simulate(int timeLimit);
+    void print(int iconType);
 
-    void input();
+    void simulate(int timeLimit, int iconType = 0);
+
+    void input(int iconType = 0);
 
     Simulation(int seed = 1);
 };

@@ -34,7 +34,7 @@ struct Earth : public Pixel
 {
     bool dispatchShift(Simulation& sim, int deltavx, int deltavy, int x, int y) override;
 
-    Earth();
+    Earth(int iconType = 0);
 };
 
 struct Water : public Pixel
@@ -48,5 +48,5 @@ struct Water : public Pixel
 
     void setDebugIcon() override;
 
-    Water(int argvx = 0, int argvy = 0);
+    Water(int argvx = 0, int argvy = 0, int iconType = 0);
 };

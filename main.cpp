@@ -18,8 +18,10 @@ int main()
     cin >> duration;
 
     Simulation mySim(16);
-    mySim.input();
-    mySim.simulate(duration);
+
+    int iconType = 0; ///use 2 if your terminal doesn't support ANSI
+    mySim.input(iconType);
+    mySim.simulate(duration, iconType);
 
     return 0;
 }
