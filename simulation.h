@@ -1,12 +1,10 @@
 #pragma once
 
-#include <bits/stdc++.h> /*
 #include <iostream>
 #include <vector>
 #include <string>
 #include <memory>
-#include <algorithm>*/
-//#include "pixel.h"
+#include <algorithm>
 
 
 ///from "pixel.h"
@@ -17,34 +15,33 @@ struct Water;
 
 class Simulation
 {
-public:
+private:
     int rows = 0, columns = 0;
 
     std::vector<std::vector<std::unique_ptr<Pixel>>> world;
 
-    bool checkIndexes(int x, int y);
+    bool checkIndices(int x, int y);
 
     inline int normV(int v);
 
-    bool shift(Pixel& curPix, int dvx, int dvy);
-
-    bool shift(Air& curPix, int dvx, int dvy);
-
-    bool shift(Earth& curPix, int dvx, int dvy);
-
-    bool shift(Water& curPix, int dvx, int dvy);
-
     void clearMoved();
 
-    bool checkAllCoords();
+public:
+    bool shift(Pixel& currentPixel, int deltavx, int deltavy, int x, int y);
+
+    bool shift(Air& currentPixel, int deltavx, int deltavy, int x, int y);
+
+    bool shift(Earth& currentPixel, int deltavx, int deltavy, int x, int y);
+
+    bool shift(Water& currentPixel, int deltavx, int deltavy, int x, int y);
 
     void calculate();
 
-    void print();
+    void print(int iconType);
 
-    void simulate(int timeLimit);
+    void simulate(int timeLimit, int iconType = 0);
 
-    void input();
+    void input(int iconType = 0);
 
     Simulation(int seed = 1);
 };

@@ -14,14 +14,14 @@ using namespace std;
 
 int main()
 {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0);
-    int timeLimit;
-    cin >> timeLimit;
+    int duration;
+    cin >> duration;
 
-    Simulation mySim;
-    mySim.input();
-    mySim.simulate(timeLimit);
+    Simulation mySim(16);
+
+    int iconType = 0; ///use 2 if your terminal doesn't support ANSI
+    mySim.input(iconType);
+    mySim.simulate(duration, iconType);
 
     return 0;
 }
